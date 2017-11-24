@@ -35,4 +35,12 @@ class ElasticSearchImportClient
       return "Success!";
     }
 
+    public function configAdd($uid, $config)
+    {
+      $response = Request::post($this->uri)
+      ->send();
+      print $response->body;
+      return "Success!";
+    }
+
 }
