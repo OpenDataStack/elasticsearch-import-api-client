@@ -1,0 +1,27 @@
+{
+    "name": "opendatastack/elasticsearch-import-api-client",
+    "type": "library",
+    "description": "API Client for the ElasticSearch Import API server",
+    "keywords": ["elasticsearch", "kibana", "api", "client"],
+    "homepage": "https://github.com/OpenDataStack/elasticsearch-import-api-client",
+    "license": "GPL",
+    "require": {
+        "php": ">=5.6"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "6.4.*",
+        "nategood/httpful": "0.2.20"
+    },
+    "autoload": {
+        "psr-4": {
+          "OpenDataStack\\Client\\": "src/client/OpenDataStack/Client"
+        },
+        "exclude-from-classmap": [
+            "/tests/"
+        ]
+    },
+    "minimum-stability": "dev",
+    "extra": {
+
+    }
+}
