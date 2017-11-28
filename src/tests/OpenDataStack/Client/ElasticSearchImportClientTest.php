@@ -1,6 +1,6 @@
 <?php
 
-namespace OpenDataStack\Client;
+namespace OpenDataStack\Tests;
 
 use PHPUnit\Framework\TestCase;
 use OpenDataStack\Client\ElasticSearchImportClient;
@@ -20,12 +20,12 @@ class ElasticSearchImportClientTest extends TestCase
 
     public function setUp()
     {
-        $this->_client = new ElasticSearchImportClient("http://192.168.99.100:8088/ping", "283y2daksjn");
+        $this->_client = new ElasticSearchImportClient("http://localhost:8088/ping", "283y2daksjn");
     }
 
     /**
-    * @todo Pseudo Code
-    */
+     * @todo Pseudo Code
+     */
     public function testImportConfigurationAdd() {
         // Test data in ./Examples/Requests/
         $importConfigurations = $this->_importConfigurations();
@@ -40,8 +40,8 @@ class ElasticSearchImportClientTest extends TestCase
     }
 
     /**
-    * @todo Pseudo Code
-    */
+     * @todo Pseudo Code
+     */
     public function testImportConfigurationDelete() {
         // Test data in ./Examples/Requests/
         $importConfigurations = $this->_importConfigurations();
@@ -66,8 +66,8 @@ class ElasticSearchImportClientTest extends TestCase
     }
 
     /**
-    * @todo Pseudo Code
-    */
+     * @todo Pseudo Code
+     */
     public function testImportRequest()
     {
         // Test data in ./Examples/Requests/
@@ -91,8 +91,8 @@ class ElasticSearchImportClientTest extends TestCase
     }
 
     /**
-    * @todo Pseudo Code
-    */
+     * @todo Pseudo Code
+     */
     public function testImportConfigurationList()
     {
         // Test data in ./Examples/Requests/
