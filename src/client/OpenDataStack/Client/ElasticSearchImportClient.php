@@ -3,7 +3,7 @@
 namespace OpenDataStack\Client;
 
 use GuzzleHttp\Client;
-
+use GuzzleHttp\Exception\RequestException;
 
 class ElasticSearchImportClient
 {
@@ -15,8 +15,6 @@ class ElasticSearchImportClient
     private $http;
 
     /**
-     *
-     *
      * @param string $uri
      * @param string $api_key
      */
@@ -36,24 +34,41 @@ class ElasticSearchImportClient
         }
 
         $this->http = new Client($config);
-
-    }
-
-    /**
-     * @param string $uid
-     */
-    public function queue($uid)
-    {
-        $response = Request::post($this->uri)
-            ->send();
-        print $response->body;
-        return "Success!";
     }
 
     public function addImportConfiguration($importConfiguration)
     {
-        $response = $this->http->request('GET', '/import-configuration');
+        $response = $this->http->request('POST', '/import-configuration', [
+            'json' => ['config' => $importConfiguration],
+        ]);
         return json_decode($response->getBody(), true);
     }
 
+    public function getImportConfiguration($importConfigurationId)
+    {
+        try {
+            $response = $this->http->request('GET', '/import-configuration/' . $importConfigurationId);
+            return json_decode($response->getBody(), true);
+        } catch (RequestException $ex) {
+            return false;
+        }
+    }
+
+    public function deleteImportConfiguration($importConfigurationId)
+    {
+        $response = $this->http->request('DELETE', '/import-configuration/' . $importConfigurationId);
+        return $response->getStatusCode();
+    }
+
+    public function requestImport($importConfigurationId)
+    {
+        $response = $this->http->request('PUT', '/import-configuration/' . $importConfigurationId);
+        return json_decode($response->getBody(), true);
+    }
+
+    public function getImportConfigurations()
+    {
+        $response = $this->http->request('GET', '/import-configuration');
+        return json_decode($response->getBody(), true);
+    }
 }
