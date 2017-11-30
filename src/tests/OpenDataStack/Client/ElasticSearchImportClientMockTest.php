@@ -14,31 +14,10 @@ use GuzzleHttp\Exception\RequestException;
 /**
  * @group functional
  */
-class ElasticSearchImportClientTest extends TestCase
+class ElasticSearchImportClientMockTest extends ElasticSearchImportClientIntegrationTest
 {
-
-    private function _importConfigurations()
-    {
-        // load list of json files from Requests/
-        $dir = new \DirectoryIterator(dirname(__FILE__) . "/Examples/Requests/");
-        $importConfirgurations = [];
-
-        foreach ($dir as $fileinfo) {
-            if (preg_match("/^.+\.json$/i", $fileinfo->getFilename())) {
-                $importConfirgurations[] = json_decode(file_get_contents($fileinfo->getPath() . '/' . $fileinfo->getFilename(), true));
-            }
-        }
-
-        return $importConfirgurations;
-    }
-
-    private function _client($handler)
-    {
-        return new ElasticSearchImportClient("http://localhost:8088", "283y2daksjn", $handler);
-    }
-
     /**
-     * @group Units
+     * @group Mock
      */
     public function testImportConfigurationAdd()
     {
@@ -57,45 +36,41 @@ class ElasticSearchImportClientTest extends TestCase
             )),
         ]);
         $handler = HandlerStack::create($mock);
-        $client = $this->_client($handler);
-        // Test data in ./Examples/Requests/
-        $importConfigurations = $this->_importConfigurations();
-        $importConfiguration = array_pop($importConfigurations);
-
-        $response = $client->addImportConfiguration($importConfiguration);
-        $this->assertArrayHasKey('log', $response);
-        $this->assertArrayHasKey('status', $response['log']);
-        $this->assertArrayHasKey('message', $response['log']);
-        $this->assertEquals($response['log']['status'], 'new');
+        $this->setClient(new ElasticSearchImportClient("http://localhost:8088", "283y2daksjn", $handler));
+        parent::testImportConfigurationAdd();
     }
 
     /**
-     * @group Units
+     * Note thqt $client is passed by ElasticSearchImportClientIntegrationTest when
+     * we want to avoid mocking and do a live integration test against the server
+     * @group Mocks
      */
-    public function testImportConfigurationDelete()
+    public function testImportConfigurationDelete($client = null)
     {
-        $mock = new MockHandler([
-            // testImportConfigurationAdd
-            new Response(200, [], json_encode(
-                [
-                    'id' => '22222222-582c-4f29-b1e4-113781e58e3b',
-                    'log' => [
-                        'status' => 'new',
-                        'message' => 'Success'
-                    ],
-                ]
-            )),
-            new Response(200, [], json_encode(
-                [
-                    'id' => '22222222-582c-4f29-b1e4-113781e58e3b',
-                    //todo: improve this by loading a test config
-                ]
-            )),
-            new Response(200, []),
-            new Response(404, []),
-        ]);
-        $handler = HandlerStack::create($mock);
-        $client = $this->_client($handler);
+        if ($client == null) {
+            $mock = new MockHandler([
+                // testImportConfigurationAdd
+                new Response(200, [], json_encode(
+                    [
+                        'id' => '22222222-582c-4f29-b1e4-113781e58e3b',
+                        'log' => [
+                            'status' => 'new',
+                            'message' => 'Success'
+                        ],
+                    ]
+                )),
+                new Response(200, [], json_encode(
+                    [
+                        'id' => '22222222-582c-4f29-b1e4-113781e58e3b',
+                        //todo: improve this by loading a test config
+                    ]
+                )),
+                new Response(200, []),
+                new Response(404, []),
+            ]);
+            $handler = HandlerStack::create($mock);
+            $client = new ElasticSearchImportClient("http://localhost:8088", "283y2daksjn", $handler);
+        }
 
         // Test data in ./Examples/Requests/
         $importConfigurations = $this->_importConfigurations();
@@ -122,7 +97,7 @@ class ElasticSearchImportClientTest extends TestCase
     }
 
     /**
-     * @group Units
+     * @group Mocks
      */
     public function testImportRequest()
     {
@@ -147,7 +122,7 @@ class ElasticSearchImportClientTest extends TestCase
             )),
         ]);
         $handler = HandlerStack::create($mock);
-        $client = $this->_client($handler);
+        $client = $this->getClient($handler);
 
         // Test data in ./Examples/Requests/
         $importConfigurations = $this->_importConfigurations();
@@ -171,7 +146,7 @@ class ElasticSearchImportClientTest extends TestCase
     }
 
     /**
-     * @group Unit
+     * @group Mocks
      */
     public function testImportConfigurationList()
     {
@@ -205,7 +180,7 @@ class ElasticSearchImportClientTest extends TestCase
             new Response(404, []),
         ]);
         $handler = HandlerStack::create($mock);
-        $client = $this->_client($handler);
+        $client = $this->getClient($handler);
 
         $importConfigurations = $this->_importConfigurations();
         foreach ($importConfigurations as $importConfiguration) {

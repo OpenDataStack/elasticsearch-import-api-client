@@ -41,6 +41,7 @@ class ElasticSearchImportClient
         $response = $this->http->request('POST', '/import-configuration', [
             'json' => ['config' => $importConfiguration],
         ]);
+
         return json_decode($response->getBody(), true);
     }
 
