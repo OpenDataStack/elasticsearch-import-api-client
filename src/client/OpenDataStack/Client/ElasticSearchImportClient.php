@@ -69,7 +69,7 @@ class ElasticSearchImportClient
     public function getImportConfigurations()
     {
         try {
-            $response = $this->http->request('GET', '/import-configuration');
+            $response = $this->http->request('GET', '/import-configurations');
             return json_decode($response->getBody(), true);
         } catch (RequestException $ex) {
             return false;

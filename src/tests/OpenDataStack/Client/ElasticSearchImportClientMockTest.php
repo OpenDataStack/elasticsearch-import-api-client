@@ -172,7 +172,7 @@ class ElasticSearchImportClientMockTest extends ElasticSearchImportClientIntegra
             )),
             new Response(200, [], json_encode(
                 [
-                    'id' => ['11111111-582c-4f29-b1e4-113781e18e3b', '22222222-582c-4f29-b1e4-113781e18e3b'],
+                    'ids' => ['11111111-582c-4f29-b1e4-113781e18e3b', '22222222-582c-4f29-b1e4-113781e18e3b'],
                 ]
             )),
             new Response(200, []),
@@ -189,10 +189,10 @@ class ElasticSearchImportClientMockTest extends ElasticSearchImportClientIntegra
         // Get all configurations
         $response = null;
         $response = $client->getImportConfigurations();
-        $this->assertArrayHasKey('id', $response);
+        $this->assertArrayHasKey('ids', $response);
 
         // Delete all configurations
-        foreach ($response['id'] as $importConfigurationId) {
+        foreach ($response['ids'] as $importConfigurationId) {
             $response = $client->deleteImportConfiguration($importConfigurationId);
         }
 

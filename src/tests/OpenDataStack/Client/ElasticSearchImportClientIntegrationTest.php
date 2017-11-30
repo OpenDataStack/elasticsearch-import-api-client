@@ -51,7 +51,7 @@ class ElasticSearchImportClientIntegrationTest extends TestCase
     }
 
     /**
-     * @group Integration
+     * @group Integrations
      */
     public function testImportConfigurationAdd()
     {
@@ -133,59 +133,23 @@ class ElasticSearchImportClientIntegrationTest extends TestCase
     }
 
     /**
-     * @group Integrations
+     * @group Integration
      */
     public function testImportConfigurationList()
     {
-        $mock = new MockHandler([
-            // testImportConfigurationAdd
-            new Response(200, [], json_encode(
-                [
-                    'id' => '11111111-582c-4f29-b1e4-113781e18e3b',
-                    'log' => [
-                        'status' => 'new',
-                        'message' => 'Success'
-                    ]
-                ]
-            )),
-            new Response(200, [], json_encode(
-                [
-                    'id' => '22222222-582c-4f29-b1e4-113781e18e3b',
-                    'log' => [
-                        'status' => 'new',
-                        'message' => 'Success'
-                    ]
-                ]
-            )),
-            new Response(200, [], json_encode(
-                [
-                    'id' => ['11111111-582c-4f29-b1e4-113781e18e3b', '22222222-582c-4f29-b1e4-113781e18e3b'],
-                ]
-            )),
-            new Response(200, []),
-            new Response(200, []),
-            new Response(404, []),
-        ]);
-        $handler = HandlerStack::create($mock);
-        $client = $this->getClient($handler);
+        $client = $this->getClient();
 
         $importConfigurations = $this->_importConfigurations();
         foreach ($importConfigurations as $importConfiguration) {
             $response = $client->addImportConfiguration($importConfiguration);
         }
+
         // Get all configurations
         $response = null;
         $response = $client->getImportConfigurations();
-        $this->assertArrayHasKey('id', $response);
 
-        // Delete all configurations
-        foreach ($response['id'] as $importConfigurationId) {
-            $response = $client->deleteImportConfiguration($importConfigurationId);
-        }
+        $this->assertArrayHasKey('ids', $response);
+        $this->assertCount(2, $response['ids'], "We added 2 import configurations");
 
-        // Get all configurations after deleting: It should return Null
-        $response = null;
-        $response = $client->getImportConfigurations();
-        $this->assertEquals(false, $response);
     }
 }
