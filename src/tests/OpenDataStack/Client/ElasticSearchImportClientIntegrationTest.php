@@ -2,6 +2,7 @@
 
 namespace OpenDataStack\Tests;
 
+use GuzzleHttp\Exception\ClientException;
 use PHPUnit\Framework\TestCase;
 use OpenDataStack\Client\ElasticSearchImportClient;
 use GuzzleHttp\Client;
@@ -59,11 +60,18 @@ class ElasticSearchImportClientIntegrationTest extends TestCase
         $importConfigurations = $this->_importConfigurations();
         $importConfiguration = array_pop($importConfigurations);
 
-        $response = $client->addImportConfiguration($importConfiguration);
-        $this->assertArrayHasKey('log', $response);
-        $this->assertArrayHasKey('status', $response['log']);
-        $this->assertArrayHasKey('message', $response['log']);
-        $this->assertEquals($response['log']['status'], 'new');
+        try {
+          $response = $client->addImportConfiguration($importConfiguration);
+
+          $this->assertArrayHasKey('log', $response);
+          $this->assertArrayHasKey('status', $response['log']);
+          $this->assertArrayHasKey('flag', $response['log']);
+          $this->assertArrayHasKey('message', $response['log']);
+          $this->assertEquals($response['log']['flag'], 'new');
+
+        } catch (ClientException $exception) {
+          $this->fail("fail with exception code : {$exception->getCode()} and message : {$exception->getMessage()}");
+        }
     }
 
     /**
