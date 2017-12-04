@@ -54,53 +54,29 @@ class ElasticSearchImportClientMockTest extends ElasticSearchImportClientIntegra
      */
     public function testImportConfigurationDelete($client = null)
     {
-        if ($client == null) {
-            $mock = new MockHandler([
-                // testImportConfigurationAdd
-                new Response(200, [], json_encode(
-                    [
-                        'id' => '22222222-582c-4f29-b1e4-113781e58e3b',
-                        'log' => [
-                            'status' => 'new',
-                            'message' => 'Success'
-                        ],
-                    ]
-                )),
-                new Response(200, [], json_encode(
-                    [
-                        'id' => '22222222-582c-4f29-b1e4-113781e58e3b',
-                        //todo: improve this by loading a test config
-                    ]
-                )),
-                new Response(200, []),
-                new Response(404, []),
-            ]);
-            $handler = HandlerStack::create($mock);
-            $client = new ElasticSearchImportClient("http://localhost:8088", "283y2daksjn", $handler);
-        }
-
-        // Test data in ./Examples/Requests/
-        $importConfigurations = $this->_importConfigurations();
-        $importConfiguration = array_pop($importConfigurations);
-
-        // Add
-        $response = $client->addImportConfiguration($importConfiguration);
-        $this->assertArrayHasKey('log', $response);
-        $this->assertArrayHasKey('status', $response['log']);
-        $this->assertArrayHasKey('message', $response['log']);
-        $this->assertEquals($response['log']['status'], 'new');
-
-        // Confirm add worked
-        $response = $client->getImportConfiguration($importConfiguration->id);
-        $this->assertEquals($importConfiguration->id, $response['id']);
-
-        // Delete
-        $response = $client->deleteImportConfiguration($importConfiguration->id);
-        $this->assertEquals('200', $response);
-
-        // Confirm delete worked
-        $response = $client->getImportConfiguration($importConfiguration->id);
-        $this->assertEquals(false, $response);
+        $mock = new MockHandler([
+            // testImportConfigurationAdd
+            new Response(200, [], json_encode(
+                [
+                    'id' => '22222222-582c-4f29-b1e4-113781e58e3b',
+                    'log' => [
+                        'status' => 'new',
+                        'message' => 'Success'
+                    ],
+                ]
+            )),
+            new Response(200, [], json_encode(
+                [
+                    'id' => '22222222-582c-4f29-b1e4-113781e58e3b',
+                    //todo: improve this by loading a test config
+                ]
+            )),
+            new Response(200, []),
+            new Response(404, []),
+        ]);
+        $handler = HandlerStack::create($mock);
+        $this->setClient(new ElasticSearchImportClient("http://localhost:8088", "283y2daksjn", $handler));
+        parent::testImportConfigurationDelete();
     }
 
     /**
