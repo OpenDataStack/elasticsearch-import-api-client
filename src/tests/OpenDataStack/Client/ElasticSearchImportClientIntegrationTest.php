@@ -61,16 +61,14 @@ class ElasticSearchImportClientIntegrationTest extends TestCase
         $importConfiguration = array_pop($importConfigurations);
 
         try {
-          $response = $client->addImportConfiguration($importConfiguration);
-
-          $this->assertArrayHasKey('log', $response);
-          $this->assertArrayHasKey('status', $response['log']);
-          $this->assertArrayHasKey('flag', $response['log']);
-          $this->assertArrayHasKey('message', $response['log']);
-          $this->assertEquals($response['log']['flag'], 'new');
-
+            $response = $client->addImportConfiguration($importConfiguration);
+            $this->assertArrayHasKey('log', $response);
+            $this->assertArrayHasKey('status', $response['log']);
+            $this->assertArrayHasKey('flag', $response['log']);
+            $this->assertArrayHasKey('message', $response['log']);
+            $this->assertEquals($response['log']['flag'], 'new');
         } catch (ClientException $exception) {
-          $this->fail("fail with exception code : {$exception->getCode()} and message : {$exception->getMessage()}");
+            $this->fail("fail with exception code : {$exception->getCode()} and message : {$exception->getMessage()}");
         }
     }
 

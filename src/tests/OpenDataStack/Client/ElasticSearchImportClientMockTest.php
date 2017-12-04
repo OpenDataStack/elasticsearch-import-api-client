@@ -17,20 +17,27 @@ use GuzzleHttp\Exception\RequestException;
 class ElasticSearchImportClientMockTest extends ElasticSearchImportClientIntegrationTest
 {
     /**
-     * @group Mock
+     * @group Mocks
      */
     public function testImportConfigurationAdd()
     {
         // TODO: TEST CASE FOR NOT FOUND RESOURCE
+        $date = new \DateTime('now');
+        $timestamp = $date->format('Y-m-d H:i:s');
+        $log = array(
+            "status" => "new",
+            "message" => "1 created at {$timestamp}",
+            "created_at" => $timestamp
+        );
         // Create a mock and queue two responses.
         $mock = new MockHandler([
-            // testImportConfigurationAdd
             new Response(200, [], json_encode(
                 [
                     'id' => '11111111-582c-4f29-b1e4-113781e18e3b',
                     'log' => [
                         'status' => 'new',
-                        'message' => 'Success'
+                        'message' => 'Success',
+                        'flag' => $log['status'],
                     ],
                 ]
             )),
@@ -43,7 +50,7 @@ class ElasticSearchImportClientMockTest extends ElasticSearchImportClientIntegra
     /**
      * Note thqt $client is passed by ElasticSearchImportClientIntegrationTest when
      * we want to avoid mocking and do a live integration test against the server
-     * @group Mocks
+     * @group Mock
      */
     public function testImportConfigurationDelete($client = null)
     {
