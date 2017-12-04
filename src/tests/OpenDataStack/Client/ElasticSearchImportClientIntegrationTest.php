@@ -3,19 +3,15 @@
 namespace OpenDataStack\Tests;
 
 use GuzzleHttp\Exception\ClientException;
-use PHPUnit\Framework\TestCase;
 use OpenDataStack\Client\ElasticSearchImportClient;
-use GuzzleHttp\Client;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Response;
-use GuzzleHttp\Psr7\Request;
-use GuzzleHttp\Exception\RequestException;
 
 /**
  * @group functional
  */
-class ElasticSearchImportClientIntegrationTest extends TestCase
+class ElasticSearchImportClientIntegrationTest extends ElasticSearchImportClientMockTest
 {
     private $client;
 
@@ -23,21 +19,6 @@ class ElasticSearchImportClientIntegrationTest extends TestCase
     {
         parent::__construct();
         $this->setClient(new ElasticSearchImportClient("http://localhost:8088", "283y2daksjn"));
-    }
-
-    protected function _importConfigurations()
-    {
-        // load list of json files from Requests/
-        $dir = new \DirectoryIterator(dirname(__FILE__) . "/Examples/Requests/");
-        $importConfirgurations = [];
-
-        foreach ($dir as $fileinfo) {
-            if (preg_match("/^.+\.json$/i", $fileinfo->getFilename())) {
-                $importConfirgurations[] = json_decode(file_get_contents($fileinfo->getPath() . '/' . $fileinfo->getFilename(), true));
-            }
-        }
-
-        return $importConfirgurations;
     }
 
     protected function setClient($client)
@@ -53,29 +34,15 @@ class ElasticSearchImportClientIntegrationTest extends TestCase
     /**
      * @group Integrations
      */
-    public function testImportConfigurationAdd()
+    public function testImportConfigurationAdd($client = null)
     {
-        $client = $this->getClient();
-        // Test data in ./Examples/Requests/
-        $importConfigurations = $this->_importConfigurations();
-        $importConfiguration = array_pop($importConfigurations);
-
-        try {
-            $response = $client->addImportConfiguration($importConfiguration);
-            $this->assertArrayHasKey('log', $response);
-            $this->assertArrayHasKey('status', $response['log']);
-            $this->assertArrayHasKey('flag', $response['log']);
-            $this->assertArrayHasKey('message', $response['log']);
-            $this->assertEquals($response['log']['flag'], 'new');
-        } catch (ClientException $exception) {
-            $this->fail("fail with exception code : {$exception->getCode()} and message : {$exception->getMessage()}");
-        }
+        parent::testImportConfigurationAdd($this->getClient());
     }
 
     /**
      * @group Integrations
      */
-    public function testImportConfigurationDelete()
+    public function testImportConfigurationDelete($client = null)
     {
         $client = $this->getClient();
         // Test data in ./Examples/Requests/
@@ -156,7 +123,7 @@ class ElasticSearchImportClientIntegrationTest extends TestCase
     }
 
     /**
-     * @group Integration
+     * @group Integrations
      */
     public function testImportConfigurationList()
     {
