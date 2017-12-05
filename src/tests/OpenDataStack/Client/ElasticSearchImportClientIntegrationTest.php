@@ -44,33 +44,7 @@ class ElasticSearchImportClientIntegrationTest extends ElasticSearchImportClient
      */
     public function testImportConfigurationDelete($client = null)
     {
-        $client = $this->getClient();
-        // Test data in ./Examples/Requests/
-        $importConfigurations = $this->_importConfigurations();
-        $importConfiguration = array_pop($importConfigurations);
-
-        try {
-            // Add configuration
-            $response = $client->addImportConfiguration($importConfiguration);
-            $this->assertArrayHasKey('log', $response);
-            $this->assertArrayHasKey('status', $response['log']);
-            $this->assertArrayHasKey('message', $response['log']);
-            $this->assertEquals($response['log']['status'], 'new');
-
-            // Confirm add worked
-            $response = $client->getImportConfiguration($importConfiguration->id);
-            $this->assertEquals($importConfiguration->id, $response['id']);
-
-            // Delete configuration
-            $response = $client->deleteImportConfiguration($importConfiguration->id);
-            $this->assertEquals('200', $response);
-
-            // Confirm delete confirguration has worked
-            $response = $client->getImportConfiguration($importConfiguration->id);
-            $this->assertEquals(false, $response);
-        } catch (ClientException $exception) {
-            $this->fail("fail with exception code : {$exception->getCode()} and message : {$exception->getMessage()}");
-        }
+        parent::testImportConfigurationDelete($this->getClient());
     }
 
     /**

@@ -29,7 +29,7 @@ class ElasticSearchImportClientMockTest extends TestCase
     }
 
     /**
-     * @group Mock
+     * @group Mocks
      */
     public function testImportConfigurationAdd($client = null)
     {
@@ -65,8 +65,6 @@ class ElasticSearchImportClientMockTest extends TestCase
 
         try {
             $response = $client->addImportConfiguration($importConfiguration);
-            var_dump($response);
-            exit();
             $this->assertArrayHasKey('log', $response);
             $this->assertArrayHasKey('status', $response['log']);
             $this->assertArrayHasKey('flag', $response['log']);
@@ -80,7 +78,7 @@ class ElasticSearchImportClientMockTest extends TestCase
     /**
      * Note thqt $client is passed by ElasticSearchImportClientIntegrationTest when
      * we want to avoid mocking and do a live integration test against the server
-     * @group Mocks
+     * @group Mock
      */
     public function testImportConfigurationDelete($client = null)
     {
@@ -106,9 +104,35 @@ class ElasticSearchImportClientMockTest extends TestCase
                 new Response(404, []),
             ]);
             $handler = HandlerStack::create($mock);
-            $this->setClient(new ElasticSearchImportClient("http://localhost:8088", "283y2daksjn", $handler));
+            $client = new ElasticSearchImportClient("http://localhost:8088", "283y2daksjn", $handler);
         }
-        parent::testImportConfigurationDelete();
+
+        // Test data in ./Examples/Requests/
+        $importConfigurations = $this->_importConfigurations();
+        $importConfiguration = array_pop($importConfigurations);
+
+        try {
+            // Add configuration
+            $response = $client->addImportConfiguration($importConfiguration);
+            $this->assertArrayHasKey('log', $response);
+            $this->assertArrayHasKey('status', $response['log']);
+            $this->assertArrayHasKey('message', $response['log']);
+            $this->assertEquals($response['log']['status'], 'new');
+
+            // Confirm add worked
+            $response = $client->getImportConfiguration($importConfiguration->id);
+            $this->assertEquals($importConfiguration->id, $response['id']);
+
+            // Delete configuration
+            $response = $client->deleteImportConfiguration($importConfiguration->id);
+            $this->assertEquals('200', $response);
+
+            // Confirm delete confirguration has worked
+            $response = $client->getImportConfiguration($importConfiguration->id);
+            $this->assertEquals(false, $response);
+        } catch (ClientException $exception) {
+            $this->fail("fail with exception code : {$exception->getCode()} and message : {$exception->getMessage()}");
+        }
     }
 
     /**
