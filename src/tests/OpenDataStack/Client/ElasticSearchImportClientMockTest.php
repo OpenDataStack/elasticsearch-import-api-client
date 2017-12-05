@@ -29,7 +29,7 @@ class ElasticSearchImportClientMockTest extends TestCase
     }
 
     /**
-     * @group Mocks
+     * @group Mock
      */
     public function testImportConfigurationAdd($client = null)
     {
@@ -78,11 +78,18 @@ class ElasticSearchImportClientMockTest extends TestCase
     /**
      * Note thqt $client is passed by ElasticSearchImportClientIntegrationTest when
      * we want to avoid mocking and do a live integration test against the server
-     * @group Mocks
+     * @group Mock
      */
     public function testImportConfigurationDelete($client = null)
     {
         if ($client == null) {
+            $date = new \DateTime('now');
+            $timestamp = $date->format('Y-m-d H:i:s');
+            $log = array(
+                "status" => "new",
+                "message" => "1 created at {$timestamp}",
+                "created_at" => $timestamp
+            );
             $mock = new MockHandler([
                 // testImportConfigurationAdd
                 new Response(200, [], json_encode(
@@ -90,7 +97,8 @@ class ElasticSearchImportClientMockTest extends TestCase
                         'id' => '22222222-582c-4f29-b1e4-113781e58e3b',
                         'log' => [
                             'status' => 'new',
-                            'message' => 'Success'
+                            'message' => 'Success',
+                            'flag' => $log['status'],
                         ],
                     ]
                 )),
@@ -114,10 +122,11 @@ class ElasticSearchImportClientMockTest extends TestCase
         try {
             // Add configuration
             $response = $client->addImportConfiguration($importConfiguration);
+            $this->assertEquals($importConfiguration->id, $response['id']);
             $this->assertArrayHasKey('log', $response);
             $this->assertArrayHasKey('status', $response['log']);
             $this->assertArrayHasKey('message', $response['log']);
-            $this->assertEquals($response['log']['status'], 'new');
+            $this->assertEquals($response['log']['flag'], 'new');
 
             // Confirm add worked
             $response = $client->getImportConfiguration($importConfiguration->id);
@@ -136,11 +145,18 @@ class ElasticSearchImportClientMockTest extends TestCase
     }
 
     /**
-     * @group Mocks
+     * @group Mock
      */
     public function testImportRequest($client = null)
     {
         if ($client == null) {
+            $date = new \DateTime('now');
+            $timestamp = $date->format('Y-m-d H:i:s');
+            $log = array(
+                "status" => "new",
+                "message" => "1 created at {$timestamp}",
+                "created_at" => $timestamp
+            );
             $mock = new MockHandler([
                 // testImportConfigurationAdd
                 new Response(200, [], json_encode(
@@ -148,7 +164,8 @@ class ElasticSearchImportClientMockTest extends TestCase
                         'id' => '22222222-582c-4f29-b1e4-113781e58e3b',
                         'log' => [
                             'status' => 'new',
-                            'message' => 'Success'
+                            'message' => 'Success',
+                            'flag' => $log['status'],
                         ],
                     ]
                 )),
@@ -156,7 +173,9 @@ class ElasticSearchImportClientMockTest extends TestCase
                     [
                         'id' => '22222222-582c-4f29-b1e4-113781e58e3b',
                         'log' => [
-                            'status' => 'queued'
+                            'status' => 'queued',
+                            "message" => 'queued',
+                            "flag" => 'queued',
                         ],
                     ]
                 )),
@@ -171,13 +190,10 @@ class ElasticSearchImportClientMockTest extends TestCase
 
         // Add
         $response = $client->addImportConfiguration($importConfiguration);
-        $this->assertArrayHasKey('log', $response);
-        $this->assertArrayHasKey('status', $response['log']);
-        $this->assertArrayHasKey('message', $response['log']);
-        $this->assertEquals($response['log']['status'], 'new');
 
         // Request an import
         $response = $client->requestImport($importConfiguration->id);
+        $this->assertEquals($importConfiguration->id, $response['id']);
         $this->assertArrayHasKey('log', $response);
         $this->assertArrayHasKey('status', $response['log']);
         $this->assertEquals($response['log']['status'], 'queued');
@@ -191,6 +207,13 @@ class ElasticSearchImportClientMockTest extends TestCase
     public function testImportConfigurationList($client = null)
     {
         if ($client == null) {
+            $date = new \DateTime('now');
+            $timestamp = $date->format('Y-m-d H:i:s');
+            $log = array(
+                "status" => "new",
+                "message" => "1 created at {$timestamp}",
+                "created_at" => $timestamp
+            );
             $mock = new MockHandler([
                 // testImportConfigurationAdd
                 new Response(200, [], json_encode(
@@ -198,8 +221,9 @@ class ElasticSearchImportClientMockTest extends TestCase
                         'id' => '11111111-582c-4f29-b1e4-113781e18e3b',
                         'log' => [
                             'status' => 'new',
-                            'message' => 'Success'
-                        ]
+                            'message' => 'Success',
+                            'flag' => $log['status'],
+                        ],
                     ]
                 )),
                 new Response(200, [], json_encode(

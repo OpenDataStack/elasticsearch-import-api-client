@@ -2,23 +2,31 @@
 
 namespace OpenDataStack\Tests;
 
-use GuzzleHttp\Exception\ClientException;
+use PHPUnit\Framework\TestCase;
 use OpenDataStack\Client\ElasticSearchImportClient;
-use GuzzleHttp\Handler\MockHandler;
-use GuzzleHttp\HandlerStack;
-use GuzzleHttp\Psr7\Response;
 
 /**
  * @group functional
  */
-class ElasticSearchImportClientIntegrationTest extends ElasticSearchImportClientMockTest
+class ElasticSearchImportClientIntegrationTest extends TestCase
 {
     private $client;
+    private $mockTest;
 
     public function __construct()
     {
         parent::__construct();
-        $this->setClient(new ElasticSearchImportClient("http://localhost:8088", "283y2daksjn"));
+        $this->mockTest = new ElasticSearchImportClientMockTest();
+    }
+
+    protected function setMockTest($mockTest)
+    {
+        $this->mockTest = $mockTest;
+    }
+
+    protected function getMockTest()
+    {
+        return $this->mockTest;
     }
 
     protected function setClient($client)
@@ -34,25 +42,28 @@ class ElasticSearchImportClientIntegrationTest extends ElasticSearchImportClient
     /**
      * @group Integrations
      */
-    public function testImportConfigurationAdd($client = null)
+    public function testImportConfigurationAdd()
     {
-        parent::testImportConfigurationAdd($this->getClient());
+        $this->setClient(new ElasticSearchImportClient("http://localhost:8088", "283y2daksjn"));
+        $this->mockTest->testImportConfigurationAdd($this->getClient());
     }
 
     /**
      * @group Integrations
      */
-    public function testImportConfigurationDelete($client = null)
+    public function testImportConfigurationDelete()
     {
-        parent::testImportConfigurationDelete($this->getClient());
+        $this->setClient(new ElasticSearchImportClient("http://localhost:8088", "283y2daksjn"));
+        $this->mockTest->testImportConfigurationDelete($this->getClient());
     }
 
     /**
-     * @group Integrations
+     * @group Integration
      */
-    public function testImportRequest($client = null)
+    public function testImportRequest()
     {
-        parent::testImportRequest($this->getClient());
+        $this->setClient(new ElasticSearchImportClient("http://localhost:8088", "283y2daksjn"));
+        $this->mockTest->testImportRequest($this->getClient());
         // TODO, make smaller test csv and wait ~10 seconds then check status
         // changes from Requested to "Imported"
     }
@@ -62,6 +73,7 @@ class ElasticSearchImportClientIntegrationTest extends ElasticSearchImportClient
      */
     public function testImportConfigurationList($client = null)
     {
-        parent::testImportConfigurationList($this->client);
+        $this->setClient(new ElasticSearchImportClient("http://localhost:8088", "283y2daksjn"));
+        $this->mockTest->testImportConfigurationList($this->getClient());
     }
 }
