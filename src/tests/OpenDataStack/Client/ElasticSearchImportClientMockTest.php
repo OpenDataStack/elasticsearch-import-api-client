@@ -78,7 +78,7 @@ class ElasticSearchImportClientMockTest extends TestCase
     /**
      * Note thqt $client is passed by ElasticSearchImportClientIntegrationTest when
      * we want to avoid mocking and do a live integration test against the server
-     * @group Mock
+     * @group Mocks
      */
     public function testImportConfigurationDelete($client = null)
     {
@@ -136,32 +136,34 @@ class ElasticSearchImportClientMockTest extends TestCase
     }
 
     /**
-     * @group Mocks
+     * @group Mock
      */
-    public function testImportRequest()
+    public function testImportRequest($client = null)
     {
-        $mock = new MockHandler([
-            // testImportConfigurationAdd
-            new Response(200, [], json_encode(
-                [
-                    'id' => '22222222-582c-4f29-b1e4-113781e58e3b',
-                    'log' => [
-                        'status' => 'new',
-                        'message' => 'Success'
-                    ],
-                ]
-            )),
-            new Response(200, [], json_encode(
-                [
-                    'id' => '22222222-582c-4f29-b1e4-113781e58e3b',
-                    'log' => [
-                        'status' => 'queued'
-                    ],
-                ]
-            )),
-        ]);
-        $handler = HandlerStack::create($mock);
-        $client = $this->getClient($handler);
+        if ($client == null) {
+            $mock = new MockHandler([
+                // testImportConfigurationAdd
+                new Response(200, [], json_encode(
+                    [
+                        'id' => '22222222-582c-4f29-b1e4-113781e58e3b',
+                        'log' => [
+                            'status' => 'new',
+                            'message' => 'Success'
+                        ],
+                    ]
+                )),
+                new Response(200, [], json_encode(
+                    [
+                        'id' => '22222222-582c-4f29-b1e4-113781e58e3b',
+                        'log' => [
+                            'status' => 'queued'
+                        ],
+                    ]
+                )),
+            ]);
+            $handler = HandlerStack::create($mock);
+            $client = new ElasticSearchImportClient("http://localhost:8088", "283y2daksjn", $handler);
+        }
 
         // Test data in ./Examples/Requests/
         $importConfigurations = $this->_importConfigurations();
@@ -169,6 +171,8 @@ class ElasticSearchImportClientMockTest extends TestCase
 
         // Add
         $response = $client->addImportConfiguration($importConfiguration);
+        var_dump($response);
+        exit();
         $this->assertArrayHasKey('log', $response);
         $this->assertArrayHasKey('status', $response['log']);
         $this->assertArrayHasKey('message', $response['log']);
@@ -179,7 +183,6 @@ class ElasticSearchImportClientMockTest extends TestCase
         $this->assertArrayHasKey('log', $response);
         $this->assertArrayHasKey('status', $response['log']);
         $this->assertEquals($response['log']['status'], 'queued');
-
         // TODO, make smaller test csv and wait ~10 seconds then check status
         // changes from Requested to "Imported"
     }

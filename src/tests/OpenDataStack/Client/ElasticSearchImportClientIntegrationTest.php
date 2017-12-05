@@ -50,48 +50,9 @@ class ElasticSearchImportClientIntegrationTest extends ElasticSearchImportClient
     /**
      * @group Integrations
      */
-    public function testImportRequest()
+    public function testImportRequest($client = null)
     {
-        $mock = new MockHandler([
-            // testImportConfigurationAdd
-            new Response(200, [], json_encode(
-                [
-                    'id' => '22222222-582c-4f29-b1e4-113781e58e3b',
-                    'log' => [
-                        'status' => 'new',
-                        'message' => 'Success'
-                    ],
-                ]
-            )),
-            new Response(200, [], json_encode(
-                [
-                    'id' => '22222222-582c-4f29-b1e4-113781e58e3b',
-                    'log' => [
-                        'status' => 'queued'
-                    ],
-                ]
-            )),
-        ]);
-        $handler = HandlerStack::create($mock);
-        $client = $this->getClient($handler);
-
-        // Test data in ./Examples/Requests/
-        $importConfigurations = $this->_importConfigurations();
-        $importConfiguration = array_pop($importConfigurations);
-
-        // Add
-        $response = $client->addImportConfiguration($importConfiguration);
-        $this->assertArrayHasKey('log', $response);
-        $this->assertArrayHasKey('status', $response['log']);
-        $this->assertArrayHasKey('message', $response['log']);
-        $this->assertEquals($response['log']['status'], 'new');
-
-        // Request an import
-        $response = $client->requestImport($importConfiguration->id);
-        $this->assertArrayHasKey('log', $response);
-        $this->assertArrayHasKey('status', $response['log']);
-        $this->assertEquals($response['log']['status'], 'queued');
-
+        parent::testImportRequest($this->getClient());
         // TODO, make smaller test csv and wait ~10 seconds then check status
         // changes from Requested to "Imported"
     }
