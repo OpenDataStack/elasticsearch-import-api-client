@@ -136,7 +136,7 @@ class ElasticSearchImportClientMockTest extends TestCase
     }
 
     /**
-     * @group Mock
+     * @group Mocks
      */
     public function testImportRequest($client = null)
     {
@@ -171,8 +171,6 @@ class ElasticSearchImportClientMockTest extends TestCase
 
         // Add
         $response = $client->addImportConfiguration($importConfiguration);
-        var_dump($response);
-        exit();
         $this->assertArrayHasKey('log', $response);
         $this->assertArrayHasKey('status', $response['log']);
         $this->assertArrayHasKey('message', $response['log']);
@@ -188,41 +186,43 @@ class ElasticSearchImportClientMockTest extends TestCase
     }
 
     /**
-     * @group Mocks
+     * @group Mock
      */
-    public function testImportConfigurationList()
+    public function testImportConfigurationList($client = null)
     {
-        $mock = new MockHandler([
-            // testImportConfigurationAdd
-            new Response(200, [], json_encode(
-                [
-                    'id' => '11111111-582c-4f29-b1e4-113781e18e3b',
-                    'log' => [
-                        'status' => 'new',
-                        'message' => 'Success'
+        if ($client == null) {
+            $mock = new MockHandler([
+                // testImportConfigurationAdd
+                new Response(200, [], json_encode(
+                    [
+                        'id' => '11111111-582c-4f29-b1e4-113781e18e3b',
+                        'log' => [
+                            'status' => 'new',
+                            'message' => 'Success'
+                        ]
                     ]
-                ]
-            )),
-            new Response(200, [], json_encode(
-                [
-                    'id' => '22222222-582c-4f29-b1e4-113781e18e3b',
-                    'log' => [
-                        'status' => 'new',
-                        'message' => 'Success'
+                )),
+                new Response(200, [], json_encode(
+                    [
+                        'id' => '22222222-582c-4f29-b1e4-113781e18e3b',
+                        'log' => [
+                            'status' => 'new',
+                            'message' => 'Success'
+                        ]
                     ]
-                ]
-            )),
-            new Response(200, [], json_encode(
-                [
-                    'ids' => ['11111111-582c-4f29-b1e4-113781e18e3b', '22222222-582c-4f29-b1e4-113781e18e3b'],
-                ]
-            )),
-            new Response(200, []),
-            new Response(200, []),
-            new Response(404, []),
-        ]);
-        $handler = HandlerStack::create($mock);
-        $client = $this->getClient($handler);
+                )),
+                new Response(200, [], json_encode(
+                    [
+                        'ids' => ['11111111-582c-4f29-b1e4-113781e18e3b', '22222222-582c-4f29-b1e4-113781e18e3b'],
+                    ]
+                )),
+                new Response(200, []),
+                new Response(200, []),
+                new Response(404, []),
+            ]);
+            $handler = HandlerStack::create($mock);
+            $client = new ElasticSearchImportClient("http://localhost:8088", "283y2daksjn", $handler);
+        }
 
         $importConfigurations = $this->_importConfigurations();
         foreach ($importConfigurations as $importConfiguration) {

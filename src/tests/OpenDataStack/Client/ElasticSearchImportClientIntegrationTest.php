@@ -60,21 +60,8 @@ class ElasticSearchImportClientIntegrationTest extends ElasticSearchImportClient
     /**
      * @group Integrations
      */
-    public function testImportConfigurationList()
+    public function testImportConfigurationList($client = null)
     {
-        $client = $this->getClient();
-
-        $importConfigurations = $this->_importConfigurations();
-        foreach ($importConfigurations as $importConfiguration) {
-            $response = $client->addImportConfiguration($importConfiguration);
-        }
-
-        // Get all configurations
-        $response = null;
-        $response = $client->getImportConfigurations();
-
-        $this->assertArrayHasKey('ids', $response);
-        $this->assertCount(2, $response['ids'], "We added 2 import configurations");
-
+        parent::testImportConfigurationList($this->client);
     }
 }
