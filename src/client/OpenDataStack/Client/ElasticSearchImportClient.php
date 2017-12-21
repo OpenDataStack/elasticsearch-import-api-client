@@ -60,11 +60,10 @@ class ElasticSearchImportClient
         return $response->getStatusCode();
     }
 
-    public function requestImport($importConfigurationId, $uri)
+    public function requestImport($importConfiguration)
     {
-        $response = $this->http->request('PUT', '/request-import/', [
-            'query' => ['id' => $importConfigurationId, 'uri' => $uri]
-        ]);
+        $response = $this->http->request('POST', '/request-import', [
+            'json' => $importConfiguration]);
         return json_decode($response->getBody(), true);
     }
 
