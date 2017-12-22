@@ -67,6 +67,12 @@ class ElasticSearchImportClient
         return json_decode($response->getBody(), true);
     }
 
+    public function statusConfiguration($uuid)
+    {
+        $response = $this->http->request('GET', '/import-configuration/' . $uuid);
+        return $response->getBody()->getContents();
+    }
+
     public function getImportConfigurations()
     {
         try {
