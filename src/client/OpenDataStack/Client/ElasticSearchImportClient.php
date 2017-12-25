@@ -67,12 +67,6 @@ class ElasticSearchImportClient
         return json_decode($response->getBody(), true);
     }
 
-    public function statusConfiguration($uuid)
-    {
-        $response = $this->http->request('GET', '/import-configuration/' . $uuid);
-        return $response->getBody()->getContents();
-    }
-
     public function getImportConfigurations()
     {
         try {
@@ -81,5 +75,17 @@ class ElasticSearchImportClient
         } catch (RequestException $ex) {
             return false;
         }
+    }
+
+    public function statusConfiguration($uuid)
+    {
+        $response = $this->http->request('GET', '/import-configuration/' . $uuid);
+        return $response->getBody()->getContents();
+    }
+
+    public function statusResource($uuid, $resourceId)
+    {
+        $response = $this->http->request('GET', '/import-configuration/' . $uuid . '/resource/' . $resourceId);
+        return $response->getBody()->getContents();
     }
 }
