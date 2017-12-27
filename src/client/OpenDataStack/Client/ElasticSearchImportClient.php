@@ -60,6 +60,12 @@ class ElasticSearchImportClient
         return $response->getStatusCode();
     }
 
+    public function requestClear($uuid, $resourceId)
+    {
+        $response = $this->http->request('DELETE', '/request-import/' . $uuid . '/resource/' . $resourceId);
+        return json_decode($response->getBody(), true);
+    }
+
     public function requestImport($importConfiguration)
     {
         $response = $this->http->request('POST', '/request-import', [
