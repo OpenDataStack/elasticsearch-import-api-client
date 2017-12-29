@@ -18,10 +18,10 @@ class ElasticSearchImportClient
      * @param string $uri
      * @param string $api_key
      */
-    public function __construct($uri, $api_key, $handler = null)
+    public function __construct($uri, $apiKey, $handler = null)
     {
         $this->uri = $uri;
-        $this->api_key = $api_key;
+        $this->api_key = $apiKey;
 
         $config = [
             // Base URI is used with relative requests
@@ -44,25 +44,25 @@ class ElasticSearchImportClient
         return json_decode($response->getBody(), true);
     }
 
-    public function getImportConfiguration($importConfigurationId)
+    public function getImportConfiguration($datasetUuid)
     {
         try {
-            $response = $this->http->request('GET', '/import-configuration/' . $importConfigurationId);
+            $response = $this->http->request('GET', '/import-configuration/' . $datasetUuid);
             return json_decode($response->getBody(), true);
         } catch (RequestException $ex) {
             return false;
         }
     }
 
-    public function deleteImportConfiguration($importConfigurationId)
+    public function deleteImportConfiguration($datasetUuid)
     {
-        $response = $this->http->request('DELETE', '/import-configuration/' . $importConfigurationId);
-        return $response->getStatusCode();
+        $response = $this->http->request('DELETE', '/import-configuration/' . $datasetUuid);
+        return json_decode($response->getBody(), true);
     }
 
-    public function requestClear($uuid, $resourceId)
+    public function requestClear($datasetUuid, $resourceUuid)
     {
-        $response = $this->http->request('DELETE', '/request-import/' . $uuid . '/resource/' . $resourceId);
+        $response = $this->http->request('DELETE', '/request-import/' . $datasetUuid . '/resource/' . $resourceUuid);
         return json_decode($response->getBody(), true);
     }
 
@@ -83,15 +83,15 @@ class ElasticSearchImportClient
         }
     }
 
-    public function statusConfiguration($uuid)
+    public function statusConfiguration($datasetUuid)
     {
-        $response = $this->http->request('GET', '/import-configuration/' . $uuid);
+        $response = $this->http->request('GET', '/import-configuration/' . $datasetUuid);
         return $response->getBody()->getContents();
     }
 
-    public function statusResource($uuid, $resourceId)
+    public function statusResource($datasetUuid, $resourceUuid)
     {
-        $response = $this->http->request('GET', '/import-configuration/' . $uuid . '/resource/' . $resourceId);
+        $response = $this->http->request('GET', '/import-configuration/' . $datasetUuid . '/resource/' . $resourceUuid);
         return $response->getBody()->getContents();
     }
 }
