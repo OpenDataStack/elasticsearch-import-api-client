@@ -44,6 +44,14 @@ class ElasticSearchImportClient
         return json_decode($response->getBody(), true);
     }
 
+    public function updateImportConfiguration($importConfiguration)
+    {
+        $response = $this->http->request('PUT', '/import-configuration', [
+            'json' => $importConfiguration]);
+
+        return json_decode($response->getBody(), true);
+    }
+
     public function getImportConfiguration($datasetUuid)
     {
         try {
